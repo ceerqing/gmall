@@ -1,0 +1,20 @@
+{
+  "id": null,
+  "attrName": "生产日期",
+  "category1Id": 0,
+  "category2Id": 0,
+  "category3Id": 0,
+  "categoryId": 3,
+  "categoryLevel": 1,
+  "attrValueList": [
+    {
+      "valueName": "2010",
+      "edit": false
+    },
+    {
+      "valueName": "2011",
+      "edit": false
+    }
+  ],
+
+}
