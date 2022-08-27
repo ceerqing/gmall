@@ -7,6 +7,9 @@ import com.atguigu.gmall.model.product.BaseCategory3;
 import com.atguigu.gmall.product.service.BaseCategory1Service;
 import com.atguigu.gmall.product.service.BaseCategory2Service;
 import com.atguigu.gmall.product.service.BaseCategory3Service;
+import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiOperation;
+import io.swagger.annotations.ApiParam;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
@@ -16,6 +19,7 @@ import java.util.List;
  * Author：张世平
  * Date：2022/8/26 0:25
  */
+@Api("分级查询api")
 @RestController
 @RequestMapping("/admin/product")
 public class CategoryController {
@@ -31,6 +35,7 @@ public class CategoryController {
      * 获取一级分类
      * @return
      */
+    @ApiOperation("查询所有的一级分类")
     @GetMapping("/getCategory1")
     public Result getCategory1(){
         List<BaseCategory1> list = baseCategory1Service.list();
@@ -42,8 +47,9 @@ public class CategoryController {
      * @param id
      * @return
      */
+    @ApiOperation("根据一级分类id查询所有的二级分类")
     @GetMapping("/getCategory2/{id}")
-    public Result getCategory2(@PathVariable("id") Long id){
+    public Result getCategory2(@PathVariable("id")@ApiParam("一级分类的id") Long id){
         List<BaseCategory2> category2ByCate1 = baseCategory2Service.getCategory2ByCate1(id);
         return Result.ok(category2ByCate1 );
     }
@@ -53,8 +59,9 @@ public class CategoryController {
      * @param id
      * @return
      */
+    @ApiOperation("根据二级分类id查询所有三级分类")
     @GetMapping("/getCategory3/{id}")
-    public Result getCategory3(@PathVariable("id") Long id){
+    public Result getCategory3(@PathVariable("id")@ApiParam("二级分类的id") Long id){
         List<BaseCategory3> list = baseCategory3Service.getCategory3Chile(id);
         return Result.ok(list);
     }
