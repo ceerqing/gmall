@@ -10,12 +10,14 @@ import io.swagger.annotations.ApiOperation;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
+
 /**
  * Author：张世平
  * Date：2022/8/27 19:27
  */
 //http://192.168.200.1/admin/product/baseTrademark/1/10
- @Api("品牌查询api")
+ @Api(tags = "品牌查询api")
 @RestController
 @RequestMapping("/admin/product")
 public class BaseTrademarkController {
@@ -55,6 +57,14 @@ public class BaseTrademarkController {
     public Result updateTradeMark(@RequestBody BaseTrademark baseTrademark){
          baseTrademarkService.updateById(baseTrademark);
          return Result.ok();
+    }
+
+    ///baseTrademark/getTrademarkList
+    @ApiOperation("查询所有商品的品牌")
+    @GetMapping("/baseTrademark/getTrademarkList")
+    public Result  getTrademarkList(){
+        List<BaseTrademark> list = baseTrademarkService.list();
+        return Result.ok(list);
     }
 
 }

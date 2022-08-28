@@ -10,4 +10,16 @@ import com.baomidou.mybatisplus.extension.service.IService;
 */
 public interface SkuInfoService extends IService<SkuInfo> {
 
+    /**
+     * 保存spu对应的一个sku
+     * @param skuInfo
+     */
+    void saveSkuInfo(SkuInfo skuInfo);
+
+    /**
+     * 上架或者下架商品
+     * @param skuId
+     * @param flag
+     */
+    void isSale(Long skuId, int flag);
 }

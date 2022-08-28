@@ -19,7 +19,7 @@ import java.util.List;
  * Date：2022/8/27 12:01
  * http://192.168.200.1/admin/product/attrInfoList/4/23/192
  */
-@Api("平台属性crudApi")
+@Api(tags = "平台属性crudApi")
 @RestController
 @RequestMapping("/admin/product")
 public class BaseAttrController {

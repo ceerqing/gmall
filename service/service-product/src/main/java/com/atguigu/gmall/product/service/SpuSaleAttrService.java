@@ -3,6 +3,8 @@ package com.atguigu.gmall.product.service;
 import com.atguigu.gmall.model.product.SpuSaleAttr;
 import com.baomidou.mybatisplus.extension.service.IService;
 
+import java.util.List;
+
 /**
 * @author 张世平哒
 * @description 针对表【spu_sale_attr(spu销售属性)】的数据库操作Service
@@ -10,4 +12,10 @@ import com.baomidou.mybatisplus.extension.service.IService;
 */
 public interface SpuSaleAttrService extends IService<SpuSaleAttr> {
 
+    /**
+     * 根据spuId获取对应的所有属性和属性值
+     * @param supId
+     * @return
+     */
+    List<SpuSaleAttr> getAttrAndValueBySpuId(Long supId);
 }

@@ -6,6 +6,9 @@ import com.atguigu.gmall.product.service.SpuSaleAttrService;
 import com.atguigu.gmall.product.mapper.SpuSaleAttrMapper;
 import org.springframework.stereotype.Service;
 
+import javax.annotation.Resource;
+import java.util.List;
+
 /**
 * @author 张世平哒
 * @description 针对表【spu_sale_attr(spu销售属性)】的数据库操作Service实现
@@ -15,6 +18,18 @@ import org.springframework.stereotype.Service;
 public class SpuSaleAttrServiceImpl extends ServiceImpl<SpuSaleAttrMapper, SpuSaleAttr>
     implements SpuSaleAttrService{
 
+    @Resource
+    SpuSaleAttrMapper spuSaleAttrMapper;
+
+    /**
+     * 根据spuId获取所有的属性和属性值
+     * @param supId
+     * @return
+     */
+    @Override
+    public List<SpuSaleAttr> getAttrAndValueBySpuId(Long supId) {
+        return spuSaleAttrMapper.getAttrAndValueBySpuId(supId);
+    }
 }
 
 

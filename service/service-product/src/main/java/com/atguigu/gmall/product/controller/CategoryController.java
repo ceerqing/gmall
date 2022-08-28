@@ -19,7 +19,7 @@ import java.util.List;
  * Author：张世平
  * Date：2022/8/26 0:25
  */
-@Api("分级查询api")
+@Api(tags = "分级查询api")
 @RestController
 @RequestMapping("/admin/product")
 public class CategoryController {
