@@ -2,6 +2,7 @@ package com.atguigu.gmall.product.mapper;
 
 
 import com.atguigu.gmall.model.product.BaseCategory3;
+import com.atguigu.gmall.model.to.CategoryViewTo;
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 
 /**
@@ -12,6 +13,12 @@ import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 */
 public interface BaseCategory3Mapper extends BaseMapper<BaseCategory3> {
 
+    /**
+     * 根据三级分类Id获取层级详细分类
+     * @param category3Id
+     * @return
+     */
+    CategoryViewTo getCategoryView(Long category3Id);
 }
 
 

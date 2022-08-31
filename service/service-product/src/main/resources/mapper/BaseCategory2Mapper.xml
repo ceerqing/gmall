@@ -13,4 +13,26 @@
     <sql id="Base_Column_List">
         id,name,category1_id
     </sql>
+    <resultMap id="categoryTreeMap" type="com.atguigu.gmall.model.to.CategoryTreeTo">
+        <id column="id" property="categoryId"></id>
+        <result column="name" property="categoryName"></result>
+        <collection property="categoryChild" ofType="com.atguigu.gmall.model.to.CategoryTreeTo">
+        <!--二级分类封装 -->
+            <id column="c2Id" property="categoryId"></id>
+            <result column="c2_name" property="categoryName"></result>
+            <collection property="categoryChild" ofType="com.atguigu.gmall.model.to.CategoryTreeTo">
+                <!--三级分类封装 -->
+                <id column="c3Id" property="categoryId"></id>
+                <result column="c3_name" property="categoryName"></result>
+            </collection>
+        </collection>
+
+    </resultMap>
+    <select id="getCategoryTree" resultMap="categoryTreeMap">
+        select c1.*,c2.id c2Id,c2.name c2_name,c2.category1_id,
+               c3.id c3Id,c3.name c3_name,c3.category2_id
+        from base_category1 c1
+                 join base_category2 c2 on c1.id = c2.category1_id
+                 join base_category3 c3 on c2.id=c3.category2_id
+    </select>
 </mapper>

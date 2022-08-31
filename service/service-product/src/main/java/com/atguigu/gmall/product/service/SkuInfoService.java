@@ -1,6 +1,7 @@
 package com.atguigu.gmall.product.service;
 
 import com.atguigu.gmall.model.product.SkuInfo;
+import com.atguigu.gmall.model.to.SkuDetailTo;
 import com.baomidou.mybatisplus.extension.service.IService;
 
 /**
@@ -22,4 +23,11 @@ public interface SkuInfoService extends IService<SkuInfo> {
      * @param flag
      */
     void isSale(Long skuId, int flag);
+
+    /**
+     * 根据skuId获取其详细信息，图片
+     * @param skuId
+     * @return
+     */
+    SkuDetailTo getSkuDetail(Long skuId);
 }
