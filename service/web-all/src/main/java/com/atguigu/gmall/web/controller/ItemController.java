@@ -10,6 +10,7 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
 import springfox.documentation.annotations.ApiIgnore;
 
 /**
@@ -19,8 +20,10 @@ import springfox.documentation.annotations.ApiIgnore;
 @Api("商品详情")
 @Controller
 public class ItemController {
+
     @Autowired
     SkuDetailFeignClient skuDetailFeignClient;
+
     @ApiOperation("查询出在录入一个sku的详细信息")
     @GetMapping("/{skuId}.html")
     public String getSkuItem(@PathVariable("skuId") Long skuId,

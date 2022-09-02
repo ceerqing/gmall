@@ -10,4 +10,18 @@ spring:
       type: web
 
 
+app:
+  thread-pool:
+    core: 4
+    max: 8
+    keep-alive-time: 300
+    queue-size: 2000
+
+
+
+
+
+
+
+
 

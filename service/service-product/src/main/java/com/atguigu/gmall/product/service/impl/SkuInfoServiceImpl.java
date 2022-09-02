@@ -42,6 +42,7 @@ public class SkuInfoServiceImpl extends ServiceImpl<SkuInfoMapper, SkuInfo>
     SpuSaleAttrService spuSaleAttrService;
 
     @Override
+
     public void saveSkuInfo(SkuInfo skuInfo) {
         //保存到sku_info表中
         save(skuInfo);
@@ -87,6 +88,7 @@ public class SkuInfoServiceImpl extends ServiceImpl<SkuInfoMapper, SkuInfo>
      * @return
      */
     @Override
+    @Deprecated
     public SkuDetailTo getSkuDetail(Long skuId) {
         SkuDetailTo skuDetailTo = new SkuDetailTo();
         //详细信息
@@ -111,8 +113,23 @@ public class SkuInfoServiceImpl extends ServiceImpl<SkuInfoMapper, SkuInfo>
 
         skuDetailTo.setSpuSaleAttrList(saleAttrList);
 
+        //获取这个spu所拥有的sku的skuId和当前sku所有用的属性值id
+      String skuAttrAndValueIdJson= spuSaleAttrService.getSupAllSukIdAndValueId(skuInfo.getSpuId());
+        skuDetailTo.setValuesSkuJson(skuAttrAndValueIdJson);
 
         return skuDetailTo;
+    }
+
+    @Override
+    public SkuInfo getSkuInfo(Long skuId) {
+        SkuInfo skuInfo = skuInfoMapper.selectById(skuId);
+        return skuInfo;
+    }
+
+    @Override
+    public BigDecimal getPrice(Long skuId) {
+        BigDecimal nowPrice = skuInfoMapper.getNowPrice(skuId);
+        return nowPrice;
     }
 
     private BigDecimal get1010Price(Long skuId) {

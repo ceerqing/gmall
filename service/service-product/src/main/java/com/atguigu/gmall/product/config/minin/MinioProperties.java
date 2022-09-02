@@ -12,6 +12,7 @@ import org.springframework.stereotype.Component;
 @Component
 @Data
 public class MinioProperties {
+    //ConfigurationProperties
     //容器属性的读取类。这个类会去读取配置文件中的属性，赋值到对应的属性上面.
     String endpoint;
     String ak;

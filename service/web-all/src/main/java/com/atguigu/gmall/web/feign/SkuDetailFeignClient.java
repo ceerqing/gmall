@@ -5,6 +5,7 @@ import com.atguigu.gmall.model.to.SkuDetailTo;
 import org.springframework.cloud.openfeign.FeignClient;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 
 /**
@@ -15,6 +16,6 @@ import org.springframework.web.bind.annotation.RequestMapping;
 @RequestMapping("/api/inner/rpc/item")
 public interface SkuDetailFeignClient {
 
-    @GetMapping("/skuDetail/{skuId}")
-    Result<SkuDetailTo> getSkuDetail(@PathVariable("skuId") Long skuId);
+    @GetMapping("/skudetail/{skuId}")
+    public Result<SkuDetailTo> getSkuDetail(@PathVariable("skuId") Long skuId);
 }

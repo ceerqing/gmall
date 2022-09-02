@@ -4,6 +4,8 @@ import com.atguigu.gmall.model.product.SkuInfo;
 import com.atguigu.gmall.model.to.SkuDetailTo;
 import com.baomidou.mybatisplus.extension.service.IService;
 
+import java.math.BigDecimal;
+
 /**
 * @author 张世平哒
 * @description 针对表【sku_info(库存单元表)】的数据库操作Service
@@ -30,4 +32,8 @@ public interface SkuInfoService extends IService<SkuInfo> {
      * @return
      */
     SkuDetailTo getSkuDetail(Long skuId);
+
+    SkuInfo getSkuInfo(Long skuId);
+
+    BigDecimal getPrice(Long skuId);
 }
