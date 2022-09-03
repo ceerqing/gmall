@@ -1,6 +1,9 @@
 package com.atguigu.gmall.item.service.impl;
 
+import com.alibaba.cloud.commons.lang.StringUtils;
+import com.alibaba.fastjson.JSON;
 import com.atguigu.gmall.common.result.Result;
+import com.atguigu.gmall.common.util.Jsons;
 import com.atguigu.gmall.item.feign.SkuFeignDetail;
 import com.atguigu.gmall.item.service.SkuDetailService;
 import com.atguigu.gmall.model.product.SkuImage;
@@ -9,6 +12,8 @@ import com.atguigu.gmall.model.product.SpuSaleAttr;
 import com.atguigu.gmall.model.to.CategoryViewTo;
 import com.atguigu.gmall.model.to.SkuDetailTo;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.redis.core.RedisTemplate;
+import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
@@ -30,13 +35,17 @@ public class SkuDetailServiceImpl implements SkuDetailService {
     @Autowired
     ThreadPoolExecutor executor;
 
-    @Override
-    public SkuDetailTo getSkuDetail(Long skuId) {
+    @Autowired
+    StringRedisTemplate redisTemplate;
+
+
+    public SkuDetailTo getSkuDetailRpc(Long skuId) {
         SkuDetailTo skuDetailTo = new SkuDetailTo();
 
         //查询s   ku的详细信心
         CompletableFuture<SkuInfo> skuInfoFuture = CompletableFuture.supplyAsync(() -> {
             Result<SkuInfo> skuInfo = skuFeignDetail.getSkuInfo(skuId);
+
             skuDetailTo.setSkuInfo(skuInfo.getData());
             return skuInfo.getData();
         }, executor);
@@ -81,5 +90,34 @@ public class SkuDetailServiceImpl implements SkuDetailService {
                 .join();
 
         return skuDetailTo;
+    }
+
+    @Override
+    public SkuDetailTo getSkuDetail(Long skuId) {
+        //先查缓存。缓存不存在，回源查询
+        String skuInfoTo = redisTemplate.opsForValue().get("sku:info:" + skuId);
+        if ("x".equals(skuInfoTo)){
+            //不存在这个商品
+            return null;
+        }
+        //不存在
+        if (StringUtils.isEmpty(skuInfoTo)){
+            SkuDetailTo skuDetailRpc = getSkuDetailRpc(skuId);
+            if (skuDetailRpc != null){
+                //存入redis缓存
+                redisTemplate.opsForValue().set("sku:info:"+skuId, Jsons.toStr(skuDetailRpc));
+                return skuDetailRpc;
+            }else {
+                //回源查询发现不存在这个数据，防止缓存恶意的缓存穿透攻击
+                redisTemplate.opsForValue().set("sku:info:"+skuId,"x");
+                return null;
+            }
+
+        }else {
+            //缓存中存在这个数据
+            SkuDetailTo skuDetailTo = Jsons.toObject(skuInfoTo, SkuDetailTo.class);
+            return skuDetailTo;
+        }
+
     }
 }

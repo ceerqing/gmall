@@ -23,4 +23,14 @@ public class Jsons {
             return null;
         }
     }
+
+    public static<T> T toObject(String obtString, Class<T> cls) {
+        T t = null;
+        try {
+            t = mapper.readValue(obtString, cls);
+        } catch (JsonProcessingException e) {
+            e.printStackTrace();
+        }
+        return t;
+    }
 }

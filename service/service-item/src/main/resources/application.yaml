@@ -8,6 +8,9 @@ spring:
     base-url: http://192.168.200.100:9411/
     sender:
       type: web
+  redis:
+    host: 192.168.200.100
+    password: Lfy123456
 
 
 app:
