@@ -1,11 +1,17 @@
 package com.atguigu.gmall.item.api;
 
+import com.atguigu.gmall.common.config.RedisConfig;
+import com.atguigu.gmall.common.constant.SysRedisConstant;
 import com.atguigu.gmall.common.result.Result;
 
 import com.atguigu.gmall.item.service.SkuDetailService;
 import com.atguigu.gmall.model.to.SkuDetailTo;
+import io.lettuce.core.RedisClient;
 import io.swagger.annotations.Api;
+import org.redisson.api.RBloomFilter;
+import org.redisson.api.RedissonClient;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cloud.sleuth.instrument.reactor.ReactorSleuth;
 import org.springframework.web.bind.annotation.*;
 
 
@@ -22,7 +28,8 @@ public class ItemApiController {
 //    @Autowired
 //    SkuFeignDetail skuFeignDetail;
 
-
+    @Autowired
+    RedissonClient redissonClient;
     @Autowired
     SkuDetailService skuDetailService;
 
@@ -33,5 +40,12 @@ public class ItemApiController {
 
        SkuDetailTo skuDetailTo =  skuDetailService.getSkuDetail(skuId);;
         return Result.ok(skuDetailTo);
+    }
+
+    @GetMapping("/bloom/get/{skuId}")
+    public Result bloomTest(@PathVariable("skuId")Long skuId){
+        RBloomFilter<Object> bloomFilter = redissonClient.getBloomFilter(SysRedisConstant.SKU_BLOOM);
+        boolean contains = bloomFilter.contains(skuId);
+        return Result.ok(skuId+"存在嘛"+contains);
     }
 }

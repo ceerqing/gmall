@@ -1,9 +1,9 @@
 package com.atguigu.gmall.item.service.impl;
 
 import com.alibaba.cloud.commons.lang.StringUtils;
-import com.alibaba.fastjson.JSON;
 import com.atguigu.gmall.common.result.Result;
 import com.atguigu.gmall.common.util.Jsons;
+import com.atguigu.gmall.item.cache.CacheOpsService;
 import com.atguigu.gmall.item.feign.SkuFeignDetail;
 import com.atguigu.gmall.item.service.SkuDetailService;
 import com.atguigu.gmall.model.product.SkuImage;
@@ -11,22 +11,23 @@ import com.atguigu.gmall.model.product.SkuInfo;
 import com.atguigu.gmall.model.product.SpuSaleAttr;
 import com.atguigu.gmall.model.to.CategoryViewTo;
 import com.atguigu.gmall.model.to.SkuDetailTo;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.stereotype.Service;
 
-import javax.annotation.Resource;
 import java.math.BigDecimal;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ThreadPoolExecutor;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 /**
  * Author：张世平
  * Date：2022/9/1 11:49
  */
 @Service
+@Slf4j
 public class SkuDetailServiceImpl implements SkuDetailService {
 
     @Autowired
@@ -38,10 +39,14 @@ public class SkuDetailServiceImpl implements SkuDetailService {
     @Autowired
     StringRedisTemplate redisTemplate;
 
+    @Autowired
+    CacheOpsService cacheOpsService;
+
 
     public SkuDetailTo getSkuDetailRpc(Long skuId) {
         SkuDetailTo skuDetailTo = new SkuDetailTo();
 
+        AtomicBoolean flag= new AtomicBoolean(false);
         //查询s   ku的详细信心
         CompletableFuture<SkuInfo> skuInfoFuture = CompletableFuture.supplyAsync(() -> {
             Result<SkuInfo> skuInfo = skuFeignDetail.getSkuInfo(skuId);
@@ -52,6 +57,10 @@ public class SkuDetailServiceImpl implements SkuDetailService {
 
         //三级分类
         CompletableFuture<Void> cateGoryFuture = skuInfoFuture.thenAcceptAsync(skuInfo -> {
+            if (skuInfo==null){
+                flag.set(true);
+                return;
+            }
             Result<CategoryViewTo> categoryView = skuFeignDetail
                     .getCategoryView(skuInfo.getCategory3Id());
             skuDetailTo.setCategoryView(categoryView.getData());
@@ -59,6 +68,9 @@ public class SkuDetailServiceImpl implements SkuDetailService {
 
         //查询图片
         CompletableFuture<Void> imageFuture = skuInfoFuture.thenAcceptAsync(skuInfo -> {
+            if (skuInfo==null){
+                return;
+            }
             Result<List<SkuImage>> skuImages = skuFeignDetail.getSkuImages(skuId);
             skuInfo.setSkuImageList(skuImages.getData());
         }, executor);
@@ -66,12 +78,18 @@ public class SkuDetailServiceImpl implements SkuDetailService {
         //根据三级id查询父级分类
 
         CompletableFuture<Void> spuAttrFuture= skuInfoFuture.thenAcceptAsync(skuInfo -> {
+            if (skuInfo==null){
+                return;
+            }
             Result<List<SpuSaleAttr>> listAttr = skuFeignDetail.getSkuSaleattrvalues(skuInfo.getSpuId(), skuId);
             skuDetailTo.setSpuSaleAttrList(listAttr.getData());
         }, executor);
 
         //查询所有spu对应sku的skuId和属性值的id
         CompletableFuture<Void> valueJsonFuture = skuInfoFuture.thenAcceptAsync(skuInfo -> {
+            if (skuInfo==null){
+                return;
+            }
             Result<String> valueJson = skuFeignDetail.getValueJson(skuInfo.getSpuId());
             skuDetailTo.setValuesSkuJson(valueJson.getData());
         }, executor);
@@ -89,11 +107,50 @@ public class SkuDetailServiceImpl implements SkuDetailService {
                 .allOf(priceFuture,valueJsonFuture,spuAttrFuture,imageFuture,cateGoryFuture)
                 .join();
 
+        if (flag.get()){
+            return null;//不存在
+        }
         return skuDetailTo;
     }
 
     @Override
     public SkuDetailTo getSkuDetail(Long skuId) {
+        //查缓存
+       SkuDetailTo skuDetailTo= cacheOpsService.getCacheData(skuId,SkuDetailTo.class);
+
+       if (skuDetailTo == null){
+
+           //不命中。先过布隆过滤器，在回源
+           boolean isInBoolm = cacheOpsService.boolmContain(skuId);
+           if (isInBoolm){
+               //布隆过滤器判断可能存在加锁
+               log.info("{}要回源，可能存在恶意攻击....",skuId);
+               boolean isGetLock=cacheOpsService.tryLock(skuId);
+               if (isGetLock){
+                   log.info("id为：{}商品正在回源操作",skuId);
+                   //回源,可能存在，可能不存在数据库中
+                   SkuDetailTo skuDetailRpc = getSkuDetailRpc(skuId);
+                   cacheOpsService.saveCacheData(skuId, skuDetailRpc);
+                   //释放锁
+                   cacheOpsService.unLock(skuId);
+                   return skuDetailRpc;
+               }else {
+                   //没有得到锁
+                   try {
+                       Thread.sleep(1000);
+                       return cacheOpsService.getCacheData(skuId,SkuDetailTo.class);
+                   } catch (InterruptedException e) {
+                       e.printStackTrace();
+                   }
+               }
+
+           }
+       }
+
+        return skuDetailTo;
+    }
+
+    public SkuDetailTo getSkuDetailss(Long skuId) {
         //先查缓存。缓存不存在，回源查询
         String skuInfoTo = redisTemplate.opsForValue().get("sku:info:" + skuId);
         if ("x".equals(skuInfoTo)){

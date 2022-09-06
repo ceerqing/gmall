@@ -13,6 +13,7 @@ spring:
     password: Lfy123456
 
 
+
 app:
   thread-pool:
     core: 4
