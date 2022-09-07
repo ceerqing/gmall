@@ -1,10 +1,11 @@
-package com.atguigu.gmall.item.feign;
+package com.atguigu.feigin.client.product;
 
 import com.atguigu.gmall.common.result.Result;
 import com.atguigu.gmall.model.product.SkuImage;
 import com.atguigu.gmall.model.product.SkuInfo;
 import com.atguigu.gmall.model.product.SpuSaleAttr;
 
+import com.atguigu.gmall.model.to.CategoryTreeTo;
 import com.atguigu.gmall.model.to.CategoryViewTo;
 import com.atguigu.gmall.model.to.SkuDetailTo;
 
@@ -25,7 +26,8 @@ import java.util.List;
 @FeignClient("service-product")
 @RequestMapping("/api/inner/rpc/product")
 public interface SkuFeignDetail {
-
+   @GetMapping("/category/tree")
+   public Result<List<CategoryTreeTo>> getCategoryTree();
 
    @GetMapping("/skudetail/detail/{skuId}")  //不要用这个超级接口
    Result<SkuDetailTo> getSkuDetail(@PathVariable("skuId") Long skuId);

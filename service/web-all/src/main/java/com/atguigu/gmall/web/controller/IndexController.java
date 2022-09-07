@@ -1,14 +1,13 @@
 package com.atguigu.gmall.web.controller;
 
+import com.atguigu.feigin.client.product.SkuFeignDetail;
 import com.atguigu.gmall.common.result.Result;
 import com.atguigu.gmall.model.to.CategoryTreeTo;
-import com.atguigu.gmall.web.feign.CategoryFeignClient;
+
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.cloud.sleuth.instrument.reactor.ReactorSleuth;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
 
 import java.util.List;
 
@@ -21,12 +20,12 @@ import java.util.List;
 public class IndexController {
 
     @Autowired
-    CategoryFeignClient categoryFeignClient;
+    SkuFeignDetail skuFeignDetail;
 
     @GetMapping({"/","/index"})
     public String getIndexCategoryTree(Model model){
         //远程调用查询所有的分类
-        Result<List<CategoryTreeTo>> result = categoryFeignClient.getCategoryTree();
+        Result<List<CategoryTreeTo>> result = skuFeignDetail.getCategoryTree();
 
         if(result.isOk()){
             //远程成功。 强类型语言

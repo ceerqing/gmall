@@ -66,6 +66,12 @@
             <scope>compile</scope>
         </dependency>
 
+
+        <dependency>
+            <groupId>com.atguigu.gmall</groupId>
+            <artifactId>feigin-client</artifactId>
+            <version>1.0</version>
+        </dependency>
     </dependencies>
 
 

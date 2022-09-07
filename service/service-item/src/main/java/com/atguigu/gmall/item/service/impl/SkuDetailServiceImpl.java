@@ -1,12 +1,13 @@
 package com.atguigu.gmall.item.service.impl;
 
 import com.alibaba.cloud.commons.lang.StringUtils;
+import com.atguigu.feigin.client.product.SkuFeignDetail;
 import com.atguigu.gmall.common.constant.SysRedisConstant;
 import com.atguigu.gmall.common.result.Result;
 import com.atguigu.gmall.common.util.Jsons;
 
 
-import com.atguigu.gmall.item.feign.SkuFeignDetail;
+
 import com.atguigu.gmall.item.service.SkuDetailService;
 import com.atguigu.gmall.model.product.SkuImage;
 import com.atguigu.gmall.model.product.SkuInfo;

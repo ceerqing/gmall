@@ -1,11 +1,10 @@
-package com.atguigu.gmall.web.feign;
+package com.atguigu.feigin.client.item;
 
 import com.atguigu.gmall.common.result.Result;
 import com.atguigu.gmall.model.to.SkuDetailTo;
 import org.springframework.cloud.openfeign.FeignClient;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 
 /**
