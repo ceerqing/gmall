@@ -81,11 +81,11 @@ public class SkuInfoServiceImpl extends ServiceImpl<SkuInfoMapper, SkuInfo>
             skuImage.setSkuId(skuId);
         }
 
-        RBloomFilter<Object> bloomFilter = redissonClient.getBloomFilter(SysRedisConstant.SKU_BLOOM);
-        //添加到布隆过滤器中
-        if (bloomFilter.isExists()){
-            bloomFilter.add(skuId);
-        }
+//        RBloomFilter<Object> bloomFilter = redissonClient.getBloomFilter(SysRedisConstant.SKU_BLOOM);
+//        //添加到布隆过滤器中
+//        if (bloomFilter.isExists()){
+//            bloomFilter.add(skuId);
+//        }
 
         skuImageService.saveBatch(skuImageList);
 

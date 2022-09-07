@@ -4,6 +4,7 @@ import com.atguigu.gmall.common.result.Result;
 import com.atguigu.gmall.model.to.CategoryTreeTo;
 import com.atguigu.gmall.product.mapper.BaseCategory2Mapper;
 import com.atguigu.gmall.product.service.BaseCategory2Service;
+import com.atguigu.mall.cache.cache.annotation.GmallCache;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import org.bouncycastle.LICENSE;
@@ -25,6 +26,7 @@ public class CategoryApiController {
 
     @Autowired
     BaseCategory2Service baseCategory2Service;
+
 
     @ApiOperation("获取所有的分类及其子分类")
     @GetMapping("/category/tree")

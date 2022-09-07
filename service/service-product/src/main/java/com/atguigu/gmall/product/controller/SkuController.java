@@ -53,5 +53,11 @@ public class SkuController {
         return Result.ok();
     }
 
+    @ApiOperation("根据id删除sku")
+    @GetMapping("/delete/{skuId}")
+    public Result deleteDSkuById(@PathVariable("skuId") Long skuId){
+        skuInfoService.removeById(skuId);
+        return Result.ok();
+    }
 
 }

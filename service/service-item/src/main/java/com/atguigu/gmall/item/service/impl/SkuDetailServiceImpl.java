@@ -1,9 +1,11 @@
 package com.atguigu.gmall.item.service.impl;
 
 import com.alibaba.cloud.commons.lang.StringUtils;
+import com.atguigu.gmall.common.constant.SysRedisConstant;
 import com.atguigu.gmall.common.result.Result;
 import com.atguigu.gmall.common.util.Jsons;
-import com.atguigu.gmall.item.cache.CacheOpsService;
+
+
 import com.atguigu.gmall.item.feign.SkuFeignDetail;
 import com.atguigu.gmall.item.service.SkuDetailService;
 import com.atguigu.gmall.model.product.SkuImage;
@@ -11,6 +13,8 @@ import com.atguigu.gmall.model.product.SkuInfo;
 import com.atguigu.gmall.model.product.SpuSaleAttr;
 import com.atguigu.gmall.model.to.CategoryViewTo;
 import com.atguigu.gmall.model.to.SkuDetailTo;
+import com.atguigu.mall.cache.cache.annotation.GmallCache;
+import com.atguigu.mall.cache.cache.service.CacheOpsService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.StringRedisTemplate;
@@ -113,8 +117,21 @@ public class SkuDetailServiceImpl implements SkuDetailService {
         return skuDetailTo;
     }
 
+    @GmallCache(cacheKey = SysRedisConstant.SKU_INFO_CACHE_KEY+"#{#params[0]}",
+            bloomName = SysRedisConstant.SKU_BLOOM,
+            bloomValue = "#{#params[0]}",
+            lockName = SysRedisConstant.SKU_LOCK+"#{#params[0]}",
+            ttl = 60*60*24*7L,
+            cls = SkuDetailTo.class
+    )
     @Override
     public SkuDetailTo getSkuDetail(Long skuId) {
+        SkuDetailTo skuDetailRpc = getSkuDetailRpc(skuId);
+        return skuDetailRpc;
+    }
+
+
+    public SkuDetailTo getSkuDetail2(Long skuId) {
         //查缓存
        SkuDetailTo skuDetailTo= cacheOpsService.getCacheData(skuId,SkuDetailTo.class);
 
@@ -124,10 +141,10 @@ public class SkuDetailServiceImpl implements SkuDetailService {
            boolean isInBoolm = cacheOpsService.boolmContain(skuId);
            if (isInBoolm){
                //布隆过滤器判断可能存在加锁
-               log.info("{}要回源，可能存在恶意攻击....",skuId);
+               log.info("{}没有命中缓存要回源布隆过滤器判断存在，可能存在恶意攻击....",skuId);
                boolean isGetLock=cacheOpsService.tryLock(skuId);
                if (isGetLock){
-                   log.info("id为：{}商品正在回源操作",skuId);
+                   log.info("id为{}商品正在回源操作....",skuId);
                    //回源,可能存在，可能不存在数据库中
                    SkuDetailTo skuDetailRpc = getSkuDetailRpc(skuId);
                    cacheOpsService.saveCacheData(skuId, skuDetailRpc);

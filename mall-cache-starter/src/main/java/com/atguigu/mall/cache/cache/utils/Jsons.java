@@ -1,11 +1,9 @@
-package com.atguigu.gmall.common.util;
+package com.atguigu.mall.cache.cache.utils;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
-
-import org.apache.commons.lang.StringUtils;
-
+import org.springframework.util.StringUtils;
 
 
 /**
