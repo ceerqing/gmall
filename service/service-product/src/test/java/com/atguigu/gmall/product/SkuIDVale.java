@@ -1,4 +1,4 @@
-package com.atgui.gmall.product;
+package com.atguigu.gmall.product;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;

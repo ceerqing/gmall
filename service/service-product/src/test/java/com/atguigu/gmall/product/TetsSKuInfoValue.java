@@ -1,4 +1,4 @@
-package com.atgui.gmall.product;
+package com.atguigu.gmall.product;
 
 import com.atguigu.gmall.common.util.Jsons;
 import org.junit.jupiter.api.Test;
