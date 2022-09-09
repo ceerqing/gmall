@@ -18,7 +18,9 @@ import org.springframework.scheduling.annotation.EnableScheduling;
 @MapperScan("com.atguigu.gmall.product.mapper")
 @SpringCloudApplication
 @Import({Swagger2Config.class})
-@EnableFeignClients
+@EnableFeignClients(basePackages = {
+        "com.atguigu.feigin.client.search"
+})
 public class ProductMainApplication {
     public static void main(String[] args) {
         SpringApplication.run(ProductMainApplication.class,args);
