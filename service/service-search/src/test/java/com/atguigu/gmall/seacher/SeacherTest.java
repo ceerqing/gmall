@@ -1,7 +1,9 @@
 package com.atguigu.gmall.seacher;
 
+import com.atguigu.gmall.model.vo.search.SearchParamVo;
 import com.atguigu.gmall.seacher.bean.Person;
 import com.atguigu.gmall.seacher.repository.PersonRepository;
+import com.atguigu.gmall.seacher.service.GoodsService;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -14,6 +16,11 @@ import org.springframework.boot.test.context.SpringBootTest;
 public class SeacherTest {
     @Autowired
     PersonRepository personRepository;
+
+
+
+    @Autowired
+    GoodsService goodsService;
 
     @Test
     public void testSave() {
@@ -52,5 +59,26 @@ public class SeacherTest {
 
         System.out.println("完成...");
 
+    }
+
+
+    @Test
+    public void testStringSplit() {
+        String str="trademark=4:小米";
+        String[] split = str.split(":");
+        System.out.println(split);
+    }
+
+
+
+    @Test
+    void testSearch(){
+        SearchParamVo vo = new SearchParamVo();
+        vo.setCategory3Id(61L);
+//        vo.setTrademark("4:小米");
+//        vo.setProps(new String[]{"4:128GB:机身存储"});
+//        vo.setOrder("2:asc");
+       // vo.setKeyword("小米");
+        goodsService.search(vo);
     }
 }

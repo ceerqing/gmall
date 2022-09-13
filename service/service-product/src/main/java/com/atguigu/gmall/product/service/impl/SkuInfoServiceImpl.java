@@ -104,12 +104,14 @@ public class SkuInfoServiceImpl extends ServiceImpl<SkuInfoMapper, SkuInfo>
     @Override
     public void isSale(Long skuId, int flag) {
         //1 上架 0下架
+
         if (flag==1){
-            //添加到es中
             Goods goods=getGoodInfo(skuId);
+            //添加到es中
             searchFeignClient.saveGoods(goods);
         }else {
             //从es中删除
+            searchFeignClient.deleteGoods(skuId);
         }
         skuInfoMapper.isSale(skuId,flag );
     }

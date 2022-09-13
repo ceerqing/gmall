@@ -1,6 +1,8 @@
 package com.atguigu.gmall.seacher.service;
 
 import com.atguigu.gmall.model.list.Goods;
+import com.atguigu.gmall.model.vo.search.SearchParamVo;
+import com.atguigu.gmall.model.vo.search.SearchResponseVo;
 
 /**
  * Author：张世平
@@ -8,4 +10,8 @@ import com.atguigu.gmall.model.list.Goods;
  */
 public interface GoodsService {
     void save(Goods goods);
+
+    void delete(Long  skuId);
+
+    SearchResponseVo search(SearchParamVo searchParamVo)    ;
 }

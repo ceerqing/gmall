@@ -16,5 +16,4 @@ public class SearchAttr {
     @Field(type = FieldType.Keyword)
     private String attrName;
 
-
 }

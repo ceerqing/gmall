@@ -10,8 +10,11 @@ import org.springframework.cloud.openfeign.EnableFeignClients;
  * Date：2022/8/29 1:25
  */
 @SpringCloudApplication
-@EnableFeignClients(basePackages = {"com.atguigu.feigin.client.item",
-        "com.atguigu.feigin.client.product"})
+@EnableFeignClients(basePackages = {
+        "com.atguigu.feigin.client.item",
+        "com.atguigu.feigin.client.product",
+        "com.atguigu.feigin.client.search"
+})
 
 public class WebAllMainApplication {
     public static void main(String[] args) {
