@@ -24,4 +24,8 @@ public interface SearchFeignClient {
 
     @PostMapping("/goods/search")
     Result<SearchResponseVo> search(@RequestBody SearchParamVo searchParamVo);
+
+    @PutMapping("/goods/updatehotscore/{skuId}")
+    Result updateSkuHotScore(@PathVariable("skuId") Long skuId,
+                           @RequestParam("increment") Long increment);
 }

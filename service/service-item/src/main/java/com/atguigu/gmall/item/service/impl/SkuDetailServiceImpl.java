@@ -2,6 +2,7 @@ package com.atguigu.gmall.item.service.impl;
 
 import com.alibaba.cloud.commons.lang.StringUtils;
 import com.atguigu.feigin.client.product.SkuFeignDetail;
+import com.atguigu.feigin.client.search.SearchFeignClient;
 import com.atguigu.gmall.common.constant.SysRedisConstant;
 import com.atguigu.gmall.common.result.Result;
 import com.atguigu.gmall.common.util.Jsons;
@@ -47,6 +48,12 @@ public class SkuDetailServiceImpl implements SkuDetailService {
     @Autowired
     CacheOpsService cacheOpsService;
 
+    @Autowired
+    SearchFeignClient searchFeignClient;
+
+
+    @Autowired
+    StringRedisTemplate stringRedisTemplate;
 
     public SkuDetailTo getSkuDetailRpc(Long skuId) {
         SkuDetailTo skuDetailTo = new SkuDetailTo();
@@ -127,8 +134,19 @@ public class SkuDetailServiceImpl implements SkuDetailService {
     )
     @Override
     public SkuDetailTo getSkuDetail(Long skuId) {
+
         SkuDetailTo skuDetailRpc = getSkuDetailRpc(skuId);
         return skuDetailRpc;
+    }
+
+    @Override
+    public void updateHotScore(Long skuId) {
+        Long increment = stringRedisTemplate.opsForValue()
+                .increment(SysRedisConstant.SKU_HOTSCORE + skuId);
+
+        if (increment % 100 == 0) {
+            searchFeignClient.updateSkuHotScore(skuId, increment);
+        }
     }
 
 

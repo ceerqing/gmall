@@ -8,6 +8,7 @@ import com.atguigu.gmall.seacher.service.GoodsService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cloud.sleuth.instrument.reactor.ReactorSleuth;
 import org.springframework.web.bind.annotation.*;
 
 /**
@@ -39,5 +40,14 @@ public class SearchApiController {
     Result<SearchResponseVo> search(@RequestBody SearchParamVo searchParamVo){
         SearchResponseVo vo=goodsService.search(searchParamVo);
         return Result.ok(vo);
+    }
+
+    @PutMapping("/goods/updatehotscore/{skuId}")
+    Result updateSkuHotScore(@PathVariable("skuId") Long skuId,
+                             @RequestParam("increment") Long increment) {
+
+        goodsService.updateSkuHotScore(skuId, increment);
+        return Result.ok();
+
     }
 }

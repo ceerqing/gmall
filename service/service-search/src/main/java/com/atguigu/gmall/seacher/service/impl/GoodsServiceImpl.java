@@ -62,6 +62,13 @@ public class GoodsServiceImpl implements GoodsService {
         return showVo;
     }
 
+    @Override
+    public void updateSkuHotScore(Long skuId, Long increment) {
+        Goods goods = goodsRepository.findById(skuId).get();
+        goods.setHotScore(increment);
+        goodsRepository.save(goods);
+    }
+
     //前端展示的数据
     private SearchResponseVo changeToSearchRespVo(SearchHits<Goods> goods,SearchParamVo paramVo) {
         SearchResponseVo searchResponseVo = new SearchResponseVo();
@@ -121,7 +128,7 @@ public class GoodsServiceImpl implements GoodsService {
         // ，查询出经过es条件筛选出来的商品的所属所有品牌 一个品牌的所有商品,一对多
 
         //这些商品都是属于同一个品牌
-        if(goodsList!=null||goodsList.size()!=0){
+        if(goodsList!=null||goodsList.size()!=0){//这个判断是多余的
             //可以抽取一下方法
             Map<Long, List<Goods>> goodsTradeMark = goodsList.stream().collect(Collectors.groupingBy(Goods::getTmId));
             List<TrademarkVo> trademarkVos=new ArrayList<>();

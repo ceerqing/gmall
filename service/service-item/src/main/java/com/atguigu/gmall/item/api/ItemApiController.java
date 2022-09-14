@@ -34,11 +34,13 @@ public class ItemApiController {
     SkuDetailService skuDetailService;
 
 
-     @GetMapping("/skudetail/{skuId}")
-    public Result<SkuDetailTo> getSkuDetail(@PathVariable("skuId") Long skuId){
+    @GetMapping("/skudetail/{skuId}")
+    public Result<SkuDetailTo> getSkuDetail(@PathVariable("skuId") Long skuId) {
         //Result<SkuDetailTo> skuDetail = skuFeignDetail.getSkuDetail(skuId);
 
-       SkuDetailTo skuDetailTo =  skuDetailService.getSkuDetail(skuId);;
+        SkuDetailTo skuDetailTo = skuDetailService.getSkuDetail(skuId);
+
+        skuDetailService.updateHotScore(skuId);
         return Result.ok(skuDetailTo);
     }
 

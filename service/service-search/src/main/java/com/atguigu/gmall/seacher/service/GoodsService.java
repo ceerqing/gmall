@@ -14,4 +14,6 @@ public interface GoodsService {
     void delete(Long  skuId);
 
     SearchResponseVo search(SearchParamVo searchParamVo)    ;
+
+    void updateSkuHotScore(Long skuId, Long increment);
 }

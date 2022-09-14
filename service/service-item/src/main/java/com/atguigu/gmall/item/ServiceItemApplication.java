@@ -15,7 +15,11 @@ import org.springframework.context.annotation.Import;
 
 @SpringCloudApplication
 @EnableThreadPool
-@EnableFeignClients(basePackages = {"com.atguigu.feigin.client.product"})
+@EnableFeignClients(basePackages = {
+        "com.atguigu.feigin.client.product",
+         "com.atguigu.feigin.client.search"
+
+})
 public class ServiceItemApplication {
     public static void main(String[] args) {
         SpringApplication.run(ServiceItemApplication.class,args);
