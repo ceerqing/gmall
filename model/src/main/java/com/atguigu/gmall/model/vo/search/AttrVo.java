@@ -9,6 +9,7 @@ import java.util.List;
  */
 @Data
 public class AttrVo {
+    //List<AttrVo>
     private Long attrId;
     private String attrName;
     //每个属性涉及到的所有值集合

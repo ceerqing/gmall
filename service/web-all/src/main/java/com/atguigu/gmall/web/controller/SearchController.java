@@ -23,11 +23,11 @@ public class SearchController {
     SearchFeignClient searchFeignClient;
 
     @RequestMapping("/list.html")
-    public String search( SearchParamVo searchParamVo, Model model){
+    public String search(SearchParamVo searchParamVo, Model model){
         //把result数据展示到页面
-
         Result<SearchResponseVo> search = searchFeignClient.search(searchParamVo);
         SearchResponseVo data = search.getData();
+        //把result数据展示到页面
         //1、以前检索页面点击传来的所有条件，原封不动返回给页面
         model.addAttribute("searchParam",data.getSearchParam());
         //2、品牌面包屑位置的显示

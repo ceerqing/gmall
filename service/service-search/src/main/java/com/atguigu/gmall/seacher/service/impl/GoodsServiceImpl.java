@@ -2,9 +2,7 @@ package com.atguigu.gmall.seacher.service.impl;
 
 import com.atguigu.gmall.model.list.Goods;
 import com.atguigu.gmall.model.list.SearchAttr;
-import com.atguigu.gmall.model.vo.search.OrderMapVo;
-import com.atguigu.gmall.model.vo.search.SearchParamVo;
-import com.atguigu.gmall.model.vo.search.SearchResponseVo;
+import com.atguigu.gmall.model.vo.search.*;
 import com.atguigu.gmall.seacher.repository.GoodsRepository;
 import com.atguigu.gmall.seacher.service.GoodsService;
 import com.google.common.collect.Lists;
@@ -27,8 +25,9 @@ import org.springframework.data.elasticsearch.core.query.NativeSearchQuery;
 import org.springframework.data.elasticsearch.core.query.Query;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.util.*;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 /**
  * Author：张世平
@@ -65,6 +64,8 @@ public class GoodsServiceImpl implements GoodsService {
 
     //前端展示的数据
     private SearchResponseVo changeToSearchRespVo(SearchHits<Goods> goods,SearchParamVo paramVo) {
+        SearchResponseVo searchResponseVo = new SearchResponseVo();
+
         SearchResponseVo showVo = new SearchResponseVo();
         showVo.setSearchParam(paramVo);
         //2、构建品牌面包屑 trademark=1:小米
@@ -90,10 +91,7 @@ public class GoodsServiceImpl implements GoodsService {
             showVo.setPropsParamList(propsParamList);
         }
 
-        //TODO 4、所有品牌列表 。需要ES聚合分析
-        showVo.setTrademarkList(Lists.newArrayList());
-        //TODO 5、所有属性列表 。需要ES聚合分析
-        showVo.setAttrsList(Lists.newArrayList());
+
 
 
         //6、返回排序信息  order=1:desc
@@ -117,6 +115,76 @@ public class GoodsServiceImpl implements GoodsService {
             goodsList.add(goodsDemo);
         }
         showVo.setGoodsList(goodsList);
+
+
+        //TODO 4、所有品牌列表 。需要ES聚合分析,stream实现分组操作
+        // ，查询出经过es条件筛选出来的商品的所属所有品牌 一个品牌的所有商品,一对多
+
+        //这些商品都是属于同一个品牌
+        if(goodsList!=null||goodsList.size()!=0){
+            //可以抽取一下方法
+            Map<Long, List<Goods>> goodsTradeMark = goodsList.stream().collect(Collectors.groupingBy(Goods::getTmId));
+            List<TrademarkVo> trademarkVos=new ArrayList<>();
+
+            Set<Long> tradeKeys = goodsTradeMark.keySet();
+            for (Long tradeKey : tradeKeys) {
+                List<Goods> inMapGoods = goodsTradeMark.get(tradeKey);
+                Goods goods1 = inMapGoods.get(0);
+                TrademarkVo trademarkVo = new TrademarkVo(goods1.getTmLogoUrl(),
+                        goods1.getTmName(), goods1.getTmId());
+                trademarkVos.add(trademarkVo);
+            }
+
+           /* boolean flag=false;
+            goodsTradeMark.forEach((key,value)->{
+                do {
+                    Goods goods1 = value.get(0);//这样写有问题，会存在多个
+                    trademarkVos.add(new TrademarkVo(goods1.getTmLogoUrl(),goods1.getTmName(),goods1.getTmId()));
+                }while (flag);
+            });*/
+
+            showVo.setTrademarkList(trademarkVos);
+
+            //TODO 5、所有属性列表 。需要ES聚合分析
+            //获取所有明总商品的所有平台属性
+            //一个商品有多个平台属性，一个平台属性有多个平台属性值，但是一个商品只有多个平台属性，只有一个平台属性值
+            //要查到所有商品的平台属性和平台属性值]\
+
+
+            //goods的所有searchattr对象
+            Stream<SearchAttr> attrStream = goodsList.stream()
+                    .map(Goods::getAttrs).flatMap(List::stream);
+            //
+            Map<Long, List<SearchAttr>> collect = attrStream.
+                    collect(Collectors.groupingBy(SearchAttr::getAttrId));
+
+            //前端属性的展示
+            List<AttrVo> attrVos=new ArrayList<>();
+
+            Collection<List<SearchAttr>> values = collect.values();
+
+            Set<Long> keys = collect.keySet();
+
+            for (Long key : keys) {
+                List<SearchAttr> attrList = collect.get(key);
+                SearchAttr searchAttr = attrList.get(0);
+                List<String> valueList = attrList.stream()
+                        .map(SearchAttr::getAttrValue).collect(Collectors.toList());
+
+                //去重操作
+                valueList=valueList.stream().distinct().collect(Collectors.toList());
+                AttrVo attrVo = new AttrVo();
+                attrVo.setAttrValueList(valueList);
+                attrVo.setAttrId(searchAttr.getAttrId());
+                attrVo.setAttrName(searchAttr.getAttrName());
+                attrVos.add(attrVo);
+            }
+
+            showVo.setAttrsList(attrVos);
+        }
+
+
+
 
         //显示页码
         showVo.setPageNo(paramVo.getPageNo());
@@ -175,15 +243,15 @@ public class GoodsServiceImpl implements GoodsService {
     private Query getQueryBoolCondition(SearchParamVo paramVo){
         BoolQueryBuilder boolQuery = QueryBuilders.boolQuery();
 
-        if (!StringUtils.isEmpty(paramVo.getTrademark())){
+        if (paramVo.getCategory1Id()!=null){
             boolQuery.must(QueryBuilders.
                     termQuery("category1Id",paramVo.getCategory1Id()));
         }
-        if (!StringUtils.isEmpty(paramVo.getTrademark())){
+        if (paramVo.getCategory2Id()!=null){
             boolQuery.must(QueryBuilders.
                     termQuery("category2Id",paramVo.getCategory2Id()));
         }
-        if (!StringUtils.isEmpty(paramVo.getTrademark())){
+        if (paramVo.getCategory3Id()!=null){
             boolQuery.must(QueryBuilders.
                     termQuery("category3Id",paramVo.getCategory3Id()));
         }
