@@ -16,4 +16,5 @@ public class SysRedisConstant {
     public static final String SKU_BLOOM ="skuId:bloom" ;
     public static final String SKU_HOTSCORE = "sku:hotScore:";
     public static final String USER_TOKEN ="user:token:" ;
+    public static final String USERID_HEADER ="userid" ;
 }
