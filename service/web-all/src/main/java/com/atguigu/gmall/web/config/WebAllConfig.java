@@ -31,8 +31,11 @@ public class WebAllConfig {
             HttpServletRequest request = requestAttributes.getRequest();
 
             String userId = request.getHeader(SysRedisConstant.USERID_HEADER);
-            //给feign的新请求添加一个请求头
+            String tempUserId = request.getHeader(SysRedisConstant.USERTEMPID_HEADER);
+
+            //给feign的新请求添加请求头，共后面的微服务使用
             requestTemplate.header(SysRedisConstant.USERID_HEADER,userId);
+            requestTemplate.header(SysRedisConstant.USERTEMPID_HEADER,tempUserId);
         };
         return useIdInter;
     }
