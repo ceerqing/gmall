@@ -1,25 +1,21 @@
-package com.atguigu.gmall.web.config;
+package com.atguigu.gmall.common.config.feign;
 
 import com.atguigu.gmall.common.constant.SysRedisConstant;
 import feign.RequestInterceptor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.web.context.request.RequestAttributes;
 import org.springframework.web.context.request.RequestContextHolder;
 import org.springframework.web.context.request.ServletRequestAttributes;
 
-import javax.servlet.Servlet;
 import javax.servlet.http.HttpServletRequest;
 
 /**
  * Author：张世平
- * Date：2022/9/15 9:40
+ * Date：2022/9/16 16:18
  */
 @Configuration
-public class WebAllConfig {
-    //springmvc会将处理当前处理这个请求的线程和request对象进行绑定
-    //RequestContextHolder：存储当前请求线程保存的request对象
-
+public class FeignInterceptorConfiguration {
+    //给feign发起的请求添加一些请求数据
     @Bean
     public RequestInterceptor userRequestHeader(){
 

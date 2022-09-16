@@ -1,4 +1,4 @@
-package com.atguigu.gmall.item.annotation;
+package com.atguigu.gmall.common.config.threadpoolconfig;
 
 import com.atguigu.gmall.common.config.threadpoolconfig.AppThreadPoolAutoConfiguration;
 import org.springframework.context.annotation.Import;

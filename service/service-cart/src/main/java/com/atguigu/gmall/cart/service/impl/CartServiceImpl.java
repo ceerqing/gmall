@@ -17,11 +17,15 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.BoundHashOperations;
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.stereotype.Service;
+import org.springframework.web.context.request.RequestAttributes;
+import org.springframework.web.context.request.RequestContextHolder;
 
 import java.math.BigDecimal;
+import java.util.Arrays;
 import java.util.Comparator;
 import java.util.Date;
 import java.util.List;
+import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
@@ -37,7 +41,12 @@ public class CartServiceImpl implements CartService {
     StringRedisTemplate stringRedisTemplate;
 
     @Autowired
+    ThreadPoolExecutor executor;
+
+    @Autowired
     SkuFeignDetail skuFeignDetail;
+
+
     @Override
     public SkuInfo addCart(Long skuId, Integer num) {
         //添加一个商品到购物车
@@ -203,8 +212,43 @@ public class CartServiceImpl implements CartService {
                 .map(str -> Jsons.toObject(str, CartInfo.class))
                 .sorted(Comparator.comparing(CartInfo::getCreateTime).reversed())//默认规则是从小到大进行排序
                 .collect(Collectors.toList());
+
+        RequestAttributes requestAttributes = RequestContextHolder.getRequestAttributes();
+        executor.submit(()->{
+
+            //将request对象和当前线程进行绑定
+            RequestContextHolder.setRequestAttributes(requestAttributes);
+            //在查询购物车商品时更新购物车商品的价格
+            updateCartGoodsPrice(comfrimKey,cartInfos);
+            RequestContextHolder.resetRequestAttributes();
+        });
+
         return cartInfos;
     }
+
+    /**
+     * 在查询购物车对的时候更新购物车商品的价格
+     * @param comfrimKey
+     * @param cartInfos
+     */
+    private void updateCartGoodsPrice(String comfrimKey, List<CartInfo> cartInfos) {
+        //更新redis中商品的价格
+        //去数据库查询，每个微服务都有可能会使用
+        //将request对象和当前线程进行绑定
+        BoundHashOperations<String, String, String> hashOps = stringRedisTemplate.boundHashOps(comfrimKey);
+            cartInfos.forEach(cartInfo -> {
+                Long skuId = cartInfo.getSkuId();
+                BigDecimal price = skuFeignDetail.getPrice(skuId).getData();
+                //修改商品的价格
+
+                cartInfo.setSkuPrice(price);
+                cartInfo.setUpdateTime(new Date());
+                //回写给redis
+                hashOps.put(skuId+"",Jsons.toStr(cartInfo));
+            });
+    }
+
+
 
     @Override
     public void updateCartGoodsNum(Long skuId, Integer num, String comfrimKey) {
@@ -217,6 +261,8 @@ public class CartServiceImpl implements CartService {
         BoundHashOperations<String, String, String> hashOps = stringRedisTemplate.boundHashOps(comfrimKey);
         hashOps.put(skuId+"",Jsons.toStr(cartGoods));
     }
+
+
 
     @Override
     public void checkCart(Long skuId, Integer status, String comfrimKey) {
