@@ -1,8 +1,10 @@
 package com.atguigu.feigin.client.cart;
 
 import com.atguigu.gmall.common.result.Result;
+import com.atguigu.gmall.common.result.ResultCodeEnum;
 import com.atguigu.gmall.model.product.SkuInfo;
 import org.springframework.cloud.openfeign.FeignClient;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -22,6 +24,8 @@ public interface CartFeignClient {
      * @return
      */
     @GetMapping("/addToCart")
-    public Result<SkuInfo> addToCart(@RequestParam("skuId") Long skuId,
+    public Result<Object> addToCart(@RequestParam("skuId") Long skuId,
                                      @RequestParam("num") Integer num);
+    @GetMapping("/deleteCheckGoods")
+    Result deleteChecked();
 }

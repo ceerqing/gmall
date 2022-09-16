@@ -8,8 +8,8 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseBody;
 
 /**
- * 全局异常处理类
- *
+ * 全局异常处理类,定义全局异常类，定义全局异常处理类
+ * springBoot所有的controller出现异常都会走这个异常处理类，来返回结果给浏览器
  */
 @ControllerAdvice
 @Slf4j
@@ -25,7 +25,7 @@ public class GlobalExceptionHandler {
     /**
      * 自定义异常处理方法
      * @param e
-     * @return
+     * @return 一个业务的调用失败之后，根据业务抛出的异常，会调用某一个方法去处理机这个业务
      */
     @ExceptionHandler(GmallException.class)
     @ResponseBody

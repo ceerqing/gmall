@@ -1,14 +1,11 @@
 package com.atguigu.gmall.web.controller;
 
 import com.atguigu.feigin.client.cart.CartFeignClient;
-import com.atguigu.gmall.common.constant.SysRedisConstant;
 import com.atguigu.gmall.common.result.Result;
-import com.atguigu.gmall.model.product.SkuInfo;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestParam;
 
 /**
@@ -24,17 +21,42 @@ public class CartController {
     @GetMapping("/addCart.html")
     public String toCartPage(@RequestParam("skuId") Long skuId,
                              @RequestParam("skuNum") Integer skuNum,
-                             @RequestHeader(SysRedisConstant.USERID_HEADER) String userId,
                              Model model) {
 
+        Result<Object> result = cartFeignClient.addToCart(skuId, skuNum);
 
-        System.out.println("web-all 获取到的用户id："+userId);
+        if (result.isOk()){
 
-        Result<SkuInfo> result = cartFeignClient.addToCart(skuId, skuNum);
+            model.addAttribute("skuInfo",result.getData());
+            model.addAttribute("skuNum",skuNum);
 
-        model.addAttribute("skuInfo",result.getData());
-        model.addAttribute("skuNum",skuNum);
+            return "cart/addCart";
+        }else {
+            model.addAttribute("msg",result.getMessage());
+            return "cart/error";
+        }
+    }
 
-        return "cart/addCart";
+
+    /**
+     * 购物车列表页
+     * @return
+     */
+    @GetMapping("/cart.html")
+    public String cartHtml(){
+        //会发一个异步请求去查询购物车中所有的商品
+        return "cart/index";
+    }
+
+
+    @GetMapping("/cart/deleteChecked")
+    public String deleteChecked(){
+
+        /**
+         * redirect: 重定向
+         * forward: 转发
+         */
+        cartFeignClient.deleteChecked();
+        return "redirect:http://cart.gmall.com/cart.html";
     }
 }

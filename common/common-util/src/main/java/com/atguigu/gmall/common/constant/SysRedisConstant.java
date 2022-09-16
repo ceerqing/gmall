@@ -1,5 +1,7 @@
 package com.atguigu.gmall.common.constant;
 
+import io.swagger.models.auth.In;
+
 /**
  * Author：张世平
  * Date：2022/9/4 15:29
@@ -18,4 +20,17 @@ public class SysRedisConstant {
     public static final String USER_TOKEN ="user:token:" ;
     public static final String USERID_HEADER ="userid" ;
     public static final String USERTEMPID_HEADER = "usertempid";
+    public static final String USER_CART = "user:cart:";
+
+
+    /**
+     *  购物车中最多商品种类
+     */
+    public static final Integer CART_GOODS_CLASS_MAX = 200;
+
+    //
+    /**
+     * 同一个商品最大数量
+     */
+    public static final Integer CART_GOODS_MAX_NUM = 200;
 }

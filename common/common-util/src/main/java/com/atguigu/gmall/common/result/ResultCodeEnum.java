@@ -1,5 +1,6 @@
 package com.atguigu.gmall.common.result;
 
+import com.atguigu.gmall.common.constant.SysRedisConstant;
 import lombok.Getter;
 
 /**
@@ -28,7 +29,12 @@ public enum ResultCodeEnum {
     SECKILL_ILLEGAL(217, "请求不合法"),
     SECKILL_ORDER_SUCCESS(218, "下单成功"),
     COUPON_GET(220, "优惠券已经领取"),
-    COUPON_LIMIT_GET(221, "优惠券已发放完毕");
+    COUPON_LIMIT_GET(221, "优惠券已发放完毕"),
+
+    CARTGOODSCLASSOVERFLOW(222,"购物车中的商品种类数量不能超过"+ SysRedisConstant.CART_GOODS_CLASS_MAX),
+    CAET_GOODS_NUM_ORVERFLOW(233, "购物车中一件商品的的数量不能超过"+SysRedisConstant.CART_GOODS_MAX_NUM),
+    TEMP_CAET_NOT_CLEAR(224, "购物车已满，" +
+            "临时购物车中的一部分商品还没有完全添加进入用户购物车，请删除或者结算购物车中的一部分商品显示其他商品");
 
     private Integer code;
 
