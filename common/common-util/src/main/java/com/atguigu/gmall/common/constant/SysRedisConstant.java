@@ -33,4 +33,7 @@ public class SysRedisConstant {
      * 同一个商品最大数量
      */
     public static final Integer CART_GOODS_MAX_NUM = 200;
+    public static final String ORDER_TOKEN = "order:temptoken:";
+    public static final Long ORDER_CLOSE_TTL = 60*45L;
+    public static final Long ORDER_REFUND_TTL = 60*60*24*7L;
 }

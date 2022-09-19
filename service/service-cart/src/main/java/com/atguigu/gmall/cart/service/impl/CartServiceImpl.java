@@ -10,6 +10,7 @@ import com.atguigu.gmall.common.result.ResultCodeEnum;
 import com.atguigu.gmall.common.util.Jsons;
 import com.atguigu.gmall.model.cart.CartInfo;
 import com.atguigu.gmall.model.product.SkuInfo;
+import com.atguigu.gmall.model.vo.order.CartInfoVo;
 import com.atguigu.gmall.model.vo.user.UserAuthInfo;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang.StringUtils;
@@ -21,7 +22,6 @@ import org.springframework.web.context.request.RequestAttributes;
 import org.springframework.web.context.request.RequestContextHolder;
 
 import java.math.BigDecimal;
-import java.util.Arrays;
 import java.util.Comparator;
 import java.util.Date;
 import java.util.List;
@@ -214,12 +214,14 @@ public class CartServiceImpl implements CartService {
                 .collect(Collectors.toList());
 
         RequestAttributes requestAttributes = RequestContextHolder.getRequestAttributes();
+
+        //在获取商品列表的时候在进行对商品进行再次查询价格
         executor.submit(()->{
 
             //将request对象和当前线程进行绑定
             RequestContextHolder.setRequestAttributes(requestAttributes);
             //在查询购物车商品时更新购物车商品的价格
-            updateCartGoodsPrice(comfrimKey,cartInfos);
+            updateCartGoodsPrice(comfrimKey);
             RequestContextHolder.resetRequestAttributes();
         });
 
@@ -229,13 +231,26 @@ public class CartServiceImpl implements CartService {
     /**
      * 在查询购物车对的时候更新购物车商品的价格
      * @param comfrimKey
-     * @param cartInfos
+     *
      */
-    private void updateCartGoodsPrice(String comfrimKey, List<CartInfo> cartInfos) {
+    private void updateCartGoodsPrice(String comfrimKey) {
         //更新redis中商品的价格
         //去数据库查询，每个微服务都有可能会使用
         //将request对象和当前线程进行绑定
+
         BoundHashOperations<String, String, String> hashOps = stringRedisTemplate.boundHashOps(comfrimKey);
+        hashOps.values().stream()
+                .map(str-> Jsons.toObject(str,CartInfo.class))
+                .forEach(cartInfo -> {
+                    Boolean aBoolean = hashOps.hasKey(cartInfo.getSkuId()+"");
+                    if (aBoolean){
+                      hashOps.put(cartInfo.getSkuId()+"",Jsons.toStr(cartInfo));
+                    }
+                });
+
+
+
+    /*    BoundHashOperations<String, String, String> hashOps = stringRedisTemplate.boundHashOps(comfrimKey);
             cartInfos.forEach(cartInfo -> {
                 Long skuId = cartInfo.getSkuId();
                 BigDecimal price = skuFeignDetail.getPrice(skuId).getData();
@@ -245,7 +260,7 @@ public class CartServiceImpl implements CartService {
                 cartInfo.setUpdateTime(new Date());
                 //回写给redis
                 hashOps.put(skuId+"",Jsons.toStr(cartInfo));
-            });
+            });*/
     }
 
 
@@ -348,5 +363,14 @@ public class CartServiceImpl implements CartService {
 
             }*/
         }
+    }
+
+    @Override
+    public void deleteCheckGoodsHasStockGoods(String comfrimKey, List<CartInfoVo> hasStockGoods) {
+        BoundHashOperations<String, String, String> hashOps = stringRedisTemplate.boundHashOps(comfrimKey);
+        List<String> skuIds = hasStockGoods.stream()
+                .map(cartInfoVo -> cartInfoVo.getSkuId()+"")
+                .collect(Collectors.toList());
+       hashOps.delete(skuIds.toArray());
     }
 }

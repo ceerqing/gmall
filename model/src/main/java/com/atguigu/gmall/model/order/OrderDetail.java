@@ -17,6 +17,7 @@ import java.util.Date;
 public class OrderDetail extends BaseEntity {
     private static final long serialVersionUID = 1L;
 
+    private Long userId;
     @ApiModelProperty(value = "订单编号")
     @TableField("order_id")
     private Long orderId;

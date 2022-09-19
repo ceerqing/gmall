@@ -8,6 +8,7 @@
         <module>service</module>
         <module>common</module>
         <module>server-gateway</module>
+        <module>ware-manage</module>
 
     </modules>
 

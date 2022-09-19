@@ -34,7 +34,11 @@ public enum ResultCodeEnum {
     CARTGOODSCLASSOVERFLOW(222,"购物车中的商品种类数量不能超过"+ SysRedisConstant.CART_GOODS_CLASS_MAX),
     CAET_GOODS_NUM_ORVERFLOW(233, "购物车中一件商品的的数量不能超过"+SysRedisConstant.CART_GOODS_MAX_NUM),
     TEMP_CAET_NOT_CLEAR(224, "购物车已满，" +
-            "临时购物车中的一部分商品还没有完全添加进入用户购物车，请删除或者结算购物车中的一部分商品显示其他商品");
+            "临时购物车中的一部分商品还没有完全添加进入用户购物车，请删除或者结算购物车中的一部分商品显示其他商品"),
+
+    ORDER_TOKEN_INVALID(225,"页面过期，请重新刷新页面" ),
+    ALL_GOODS_NO_STOCK(226, "购物车中所有的商品都没有库存"),
+    GOODS_PRICE_UNSAME(227,"商品价格发生改变，请重新刷新数据库" );
 
     private Integer code;
 

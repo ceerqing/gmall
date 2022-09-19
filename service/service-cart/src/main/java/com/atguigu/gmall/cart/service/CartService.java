@@ -2,6 +2,7 @@ package com.atguigu.gmall.cart.service;
 
 import com.atguigu.gmall.model.cart.CartInfo;
 import com.atguigu.gmall.model.product.SkuInfo;
+import com.atguigu.gmall.model.vo.order.CartInfoVo;
 
 import java.util.List;
 
@@ -77,4 +78,11 @@ public interface CartService {
      * 合并购物车，临时用户可能会往购物车中添加商品
      */
     void mergeCart();
+
+    /**
+     * 删除选中的有库存的商品，购物车中的商品加入到了订单
+     * @param comfrimKey
+     * @param hasStockGoods
+     */
+    void deleteCheckGoodsHasStockGoods(String comfrimKey, List<CartInfoVo> hasStockGoods);
 }

@@ -22,7 +22,7 @@ public class IndexController {
     @Autowired
     SkuFeignDetail skuFeignDetail;
 
-    @GetMapping({"/","/index"})
+    @GetMapping({"/","/index","/index.html"})
     public String getIndexCategoryTree(Model model){
         //远程调用查询所有的分类
         Result<List<CategoryTreeTo>> result = skuFeignDetail.getCategoryTree();

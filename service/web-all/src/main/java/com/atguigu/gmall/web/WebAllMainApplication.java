@@ -1,5 +1,6 @@
 package com.atguigu.gmall.web;
 
+import com.atguigu.gmall.common.config.feign.EnableAutoFeignInterceptor;
 import org.springframework.boot.SpringApplication;
 
 import org.springframework.cloud.client.SpringCloudApplication;
@@ -11,12 +12,9 @@ import org.springframework.cloud.openfeign.EnableFeignClients;
  */
 @SpringCloudApplication
 @EnableFeignClients(basePackages = {
-        "com.atguigu.feigin.client.item",
-        "com.atguigu.feigin.client.product",
-        "com.atguigu.feigin.client.search",
-        "com.atguigu.feigin.client.cart"
-
+        "com.atguigu.feigin.client"
 })
+@EnableAutoFeignInterceptor
 
 public class WebAllMainApplication {
     public static void main(String[] args) {

@@ -1,13 +1,12 @@
 package com.atguigu.feigin.client.cart;
 
 import com.atguigu.gmall.common.result.Result;
-import com.atguigu.gmall.common.result.ResultCodeEnum;
-import com.atguigu.gmall.model.product.SkuInfo;
+import com.atguigu.gmall.model.cart.CartInfo;
+import com.atguigu.gmall.model.vo.order.CartInfoVo;
 import org.springframework.cloud.openfeign.FeignClient;
-import org.springframework.web.bind.annotation.DeleteMapping;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
 
 /**
  * Author：张世平
@@ -28,4 +27,10 @@ public interface CartFeignClient {
                                      @RequestParam("num") Integer num);
     @GetMapping("/deleteCheckGoods")
     Result deleteChecked();
+
+    @GetMapping("/getallcheckgoods")
+    Result<List<CartInfo>> getCheckCartGoods();
+
+    @DeleteMapping("/deletecheckhasstockgoods")
+    Result deleteCheckAndHasStockGoods(@RequestBody List<CartInfoVo> hasStockGoods);
 }
