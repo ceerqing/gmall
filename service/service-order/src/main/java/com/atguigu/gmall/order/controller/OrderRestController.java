@@ -24,7 +24,7 @@ public class OrderRestController {
         //提交订单,返回订单号
         Long orderId = orderBizService.submitOrder(submitVo,tradeNo);
 
-        return Result.ok(orderId);
+        return Result.ok(orderId+"");
     }
 }
 

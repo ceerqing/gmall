@@ -40,11 +40,15 @@ public class OrderApiController {
 
     //返回订单数据,用于支付界面
     @GetMapping("/getorderinfo/{orderid}")
-    Result<OrderInfo> getOrderInfo(@PathVariable("orderid") Long orderId){
-        UserAuthInfo userId = GetUserCartUtils.getCartUser();
+    public Result<OrderInfo> getOrderInfo(@PathVariable("orderid") Long orderId){
+        UserAuthInfo cartUser = GetUserCartUtils.getCartUser();
+        Long userId = cartUser.getUserId();
 
-        LambdaQueryWrapper<OrderInfo> wrapper = new LambdaQueryWrapper<>();
-        wrapper.eq(OrderInfo::getId,orderId).eq(OrderInfo::getUserId,userId);
+
+        QueryWrapper<OrderInfo> wrapper=new QueryWrapper<>();
+        wrapper.eq("id",orderId)
+                .eq("user_id",userId);
+
         OrderInfo orderInfo = orderInfoService.getOne(wrapper);
         return Result.ok(orderInfo);
     }
