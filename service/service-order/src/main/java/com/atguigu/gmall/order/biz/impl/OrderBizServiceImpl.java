@@ -11,6 +11,7 @@ import com.atguigu.gmall.common.execption.GmallException;
 import com.atguigu.gmall.common.result.Result;
 import com.atguigu.gmall.common.result.ResultCodeEnum;
 import com.atguigu.gmall.model.cart.CartInfo;
+import com.atguigu.gmall.model.enums.ProcessStatus;
 import com.atguigu.gmall.model.user.UserAddress;
 import com.atguigu.gmall.model.vo.order.CartInfoVo;
 import com.atguigu.gmall.model.vo.order.OrderConfirmDataVo;
@@ -196,13 +197,24 @@ public class OrderBizServiceImpl  implements OrderBizService {
 
         //设置订单的过期时间，延时任务加定时补偿
 
-        //45min不支付就要关闭。
+     /*   //45min不支付就要关闭。
         ScheduledExecutorService pool = Executors.newScheduledThreadPool(10);
         pool.schedule(()->{
             closeOrder(orderId);
-        },45,TimeUnit.MINUTES);
+        },45,TimeUnit.MINUTES);*/
 
         return orderId;
+    }
+
+    @Override
+    public void changeOrderStatus(Long userId, Long orderId) {
+        //修改成这样
+        ProcessStatus closed = ProcessStatus.CLOSED;
+        //这个样子的都修改
+        List<ProcessStatus> want=Arrays.
+                asList(ProcessStatus.UNPAID,ProcessStatus.FINISHED);
+
+        orderInfoService.changeOrderStatus(userId,orderId,closed,want);
     }
 
     @Scheduled(cron = "0 */5 * * * ?")

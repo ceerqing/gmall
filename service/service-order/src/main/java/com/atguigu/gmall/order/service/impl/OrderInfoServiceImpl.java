@@ -2,15 +2,20 @@ package com.atguigu.gmall.order.service.impl;
 
 import com.atguigu.gmall.common.cart.GetUserCartUtils;
 import com.atguigu.gmall.common.constant.SysRedisConstant;
+import com.atguigu.gmall.common.util.Jsons;
 import com.atguigu.gmall.model.enums.OrderStatus;
 import com.atguigu.gmall.model.enums.ProcessStatus;
 import com.atguigu.gmall.model.order.OrderDetail;
 import com.atguigu.gmall.model.order.OrderInfo;
+import com.atguigu.gmall.model.to.mq.OrderMsg;
 import com.atguigu.gmall.model.vo.order.OrderSubmitVo;
 import com.atguigu.gmall.order.mapper.OrderInfoMapper;
 import com.atguigu.gmall.order.service.OrderDetailService;
 import com.atguigu.gmall.order.service.OrderInfoService;
+import com.atguigu.gmall.rabbit.constant.RabbitConstant;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
+import org.springframework.amqp.rabbit.core.RabbitTemplate;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -36,6 +41,10 @@ public class OrderInfoServiceImpl extends ServiceImpl<OrderInfoMapper, OrderInfo
     @Resource
     OrderDetailService orderDetailService;
 
+    @Autowired
+    RabbitTemplate rabbitTemplate;
+
+
     @Transactional
     @Override
     public Long saveOrder(OrderSubmitVo submitVo, String tradeNo) {
@@ -50,8 +59,32 @@ public class OrderInfoServiceImpl extends ServiceImpl<OrderInfoMapper, OrderInfo
         List<OrderDetail> details = prepareOrderDetail(submitVo,orderInfo);
         orderDetailService.saveBatch(details);
 
+        //将订单数据存到mq中，超过时间还未支付订单，自动关闭订单
+        //存到延时队列中
+        OrderMsg orderMsg = new OrderMsg(orderInfo.getId(), orderInfo.getUserId());
+
+        //存入到消息队列中
+        rabbitTemplate.convertAndSend(
+                RabbitConstant.EXCHANGE_ORDER,
+                RabbitConstant.RK_ORDER_CREATED,
+                Jsons.toStr(orderMsg)
+        );
         //3、返回订单id
         return orderInfo.getId();
+    }
+
+    @Override
+    public void changeOrderStatus(Long userId, Long orderId, ProcessStatus closed, List<ProcessStatus> want) {
+
+        String orderStatus = closed.getOrderStatus().name();
+        String processStatus = closed.name();
+
+        List<String> expects = want.stream()
+                .map(status -> status.name())
+                .collect(Collectors.toList());
+
+        //幂等修改订单
+        orderInfoMapper.updateOrderStatus(orderId,userId,processStatus,orderStatus,expects);
     }
 
     private List<OrderDetail> prepareOrderDetail(OrderSubmitVo submitVo, OrderInfo orderInfo) {

@@ -3,7 +3,7 @@ package com.atguigu.gmall.common.util;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
-
+import org.springframework.amqp.core.Message;
 import org.apache.commons.lang.StringUtils;
 
 
@@ -54,5 +54,11 @@ public class Jsons {
             e.printStackTrace();
         }
         return t;
+    }
+
+    public static<T> T mqToObj(Message message, Class<T> cls) {
+        String json = new String(message.getBody());
+
+        return toObject(json,cls);
     }
 }
